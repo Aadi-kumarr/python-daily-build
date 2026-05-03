@@ -1,0 +1,3 @@
+- Fetch data from JSONPlaceholder API
+- Filter records (userId < 10)
+- Print formatted JSON output
