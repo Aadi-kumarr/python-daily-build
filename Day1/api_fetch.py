@@ -17,7 +17,7 @@ if not data:
     print("No data fetched. Exiting.")
 else:
     # Filter data
-    filtered = [post for post in data if post["userId"] < 10]
+    filtered = [post for post in data if post["userId"] == 3]
 
     print(f"\nTotal filtered records: {len(filtered)}\n")
     print("Filtered Data:\n")
