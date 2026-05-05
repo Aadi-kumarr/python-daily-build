@@ -5,20 +5,17 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, ValidationError
 from google import genai
 
-# -------------------------
 # Load environment variables
 load_dotenv()
 
 API_KEY = os.getenv("GEMINI_API_KEY")
 
 if not API_KEY:
-    raise ValueError("❌ GEMINI_API_KEY not found. Check your .env file")
+    raise ValueError(" GEMINI_API_KEY not found. Check your .env file")
 
-# -------------------------
 # Initialize Gemini client
 client = genai.Client(api_key=API_KEY)
 
-# -------------------------
 # Pydantic Schema
 
 class InvoiceData(BaseModel):
@@ -29,13 +26,11 @@ class InvoiceData(BaseModel):
     due_date: str | None
     line_items: list[str]
 
-# -------------------------
 # Load Prompt
 
 with open("prompts/invoice_extract.txt", "r") as f:
     base_prompt = f.read()
 
-# -------------------------
 # Sample invoice text (replace for testing)
 
 invoice_text = """
@@ -46,7 +41,6 @@ Total Amount after Tax : 63.72
 Product: Project Hail Mary
 """
 
-# -------------------------
 # Gemini API call
 
 try:
@@ -56,34 +50,31 @@ try:
     )
 
     raw_output = response.text
-    print("\n🔍 Raw LLM Output:\n", raw_output)
+    print("\n Raw LLM Output:\n", raw_output)
 
 except Exception as e:
-    print("\n❌ Gemini API Error:", e)
+    print("\n Gemini API Error:", e)
     raw_output = "{}"
 
-# -------------------------
 # Clean JSON (remove markdown if present)
 
 raw_output = raw_output.replace("```json", "").replace("```", "").strip()
 
-# -------------------------
 # Convert to JSON
 
 try:
     parsed_json = json.loads(raw_output)
 except Exception as e:
-    print("\n❌ Invalid JSON from LLM:", e)
+    print("\n Invalid JSON from LLM:", e)
     parsed_json = {}
 
-# -------------------------
 # Validate with Pydantic
 
 try:
     invoice = InvoiceData(**parsed_json)
 
 except ValidationError as e:
-    print("\n❌ Validation Error:\n", e)
+    print("\n Validation Error:\n", e)
     invoice = InvoiceData(
         vendor=None,
         invoice_no=None,
@@ -93,7 +84,6 @@ except ValidationError as e:
         line_items=[]
     )
 
-# -------------------------
 # Post-processing (fallback fixes)
 
 # Currency fallback
@@ -107,7 +97,7 @@ if not invoice.currency:
     elif "€" in invoice_text or "eur" in text_lower:
         invoice.currency = "EUR"
     else:
-        invoice.currency = "INR"  # safe default for your use case
+        invoice.currency = "INR"  # default
 
 # Date fallback
 if not invoice.due_date:
@@ -115,8 +105,7 @@ if not invoice.due_date:
     if match:
         invoice.due_date = match.group(1)
 
-# -------------------------
 # Final Output
 
-print("\n✅ Final Validated Output:\n")
+print("\nFinal Validated Output:\n")
 print(invoice.model_dump())
