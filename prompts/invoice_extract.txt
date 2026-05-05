@@ -1,0 +1,28 @@
+Extract structured invoice data from the given text.
+
+Return ONLY valid JSON in this exact format:
+
+{
+  "vendor": string or null,
+  "invoice_no": string or null,
+  "amount": number or null,
+  "currency": string or null,
+  "due_date": string or null,
+  "line_items": list of strings
+}
+
+Rules:
+- Do not add extra text
+- If field not found → return null
+- amount must be a number
+- currency MUST be inferred if a symbol or context exists:
+  - ₹ or "INR" → "INR"
+  - $ or "USD" → "USD"
+  - € or "EUR" → "EUR"
+- due_date:
+  - If "Due Date" is missing, use "Invoice Date" / "Date of issue"
+  - Return as YYYY-MM-DD if possible; otherwise keep original string
+- line_items should contain product/service names only
+- Return ONLY JSON (no markdown)
+
+Invoice Text:
