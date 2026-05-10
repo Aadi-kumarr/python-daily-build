@@ -1,82 +1,128 @@
 from datetime import datetime
-from pydantic import BaseModel, ValidationError
 
+from pydantic import BaseModel
+from pydantic import ValidationError
 
-# Pydantic Schema
 
 class InvoiceData(BaseModel):
+
     vendor: str
     amount: float
     currency: str
     due_date: str
 
 
-# Business Rules
-
 approved_vendors = [
+
     "BigTree Entertainment Pvt Ltd",
+
     "InterGlobe Aviation Limited",
+
     "Roppen Transportation Services Private Limited"
 ]
 
+
 credit_limit = 10000
 
-allowed_currencies = ["INR", "USD"]
 
+allowed_currencies = [
+    "INR",
+    "USD"
+]
 
-# Validator Function
 
 def validate_invoice(invoice_dict):
 
     errors = []
 
-    # Validate structure/types
-
     try:
-        invoice = InvoiceData(**invoice_dict)
+
+        invoice = InvoiceData(
+            **invoice_dict
+        )
 
     except ValidationError as e:
 
         return {
+
             "valid": False,
+
             "errors": [str(e)]
         }
 
-    # Vendor validation
-
     if invoice.vendor not in approved_vendors:
-        errors.append("Vendor not approved")
 
-    # Amount validation
+        errors.append(
+            "Vendor not approved"
+        )
 
     if invoice.amount > credit_limit:
-        errors.append("Amount exceeds credit limit")
 
-    # Currency validation
+        errors.append(
+            "Amount exceeds credit limit"
+        )
 
     if invoice.currency not in allowed_currencies:
-        errors.append("Invalid currency")
 
-    # Due date validation
+        errors.append(
+            "Invalid currency"
+        )
 
     try:
 
-        due_date = datetime.strptime(
-            invoice.due_date,
-            "%Y-%m-%d"
-        )
+        try:
+
+            due_date = datetime.strptime(
+                invoice.due_date,
+                "%Y-%m-%d"
+            )
+
+        except:
+
+            due_date = datetime.strptime(
+                invoice.due_date,
+                "%a, %d %b, %Y"
+            )
 
         today = datetime.today()
 
         if due_date.date() <= today.date():
-            errors.append("Due date is not in future")
+
+            errors.append(
+                "Due date is not in future"
+            )
 
     except:
-        errors.append("Invalid due date format")
 
-    # Final Result
+        errors.append(
+            "Invalid due date format"
+        )
 
     return {
+
         "valid": len(errors) == 0,
+
         "errors": errors
     }
+
+
+if __name__ == "__main__":
+
+    sample_invoice = {
+
+        "vendor": "BigTree Entertainment Pvt Ltd",
+
+        "amount": 63.72,
+
+        "currency": "INR",
+
+        "due_date": "2027-05-10"
+    }
+
+    result = validate_invoice(
+        sample_invoice
+    )
+
+    print("\nValidation Result:\n")
+
+    print(result)
