@@ -12,6 +12,12 @@ function App() {
 
 
   const generateWorkflow = () => {
+    if (!command.trim()) {
+
+      alert("Please enter a command");
+
+      return;
+    }
 
     const generatedWorkflow = [
 

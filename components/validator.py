@@ -49,6 +49,12 @@ def validate_invoice(invoice_dict):
 
             "errors": [str(e)]
         }
+    
+    if not invoice.vendor:
+
+        errors.append(
+            "Vendor is missing"
+        )
 
     if invoice.vendor not in approved_vendors:
 
@@ -60,6 +66,12 @@ def validate_invoice(invoice_dict):
 
         errors.append(
             "Amount exceeds credit limit"
+        )
+
+    if invoice.amount <= 0:
+
+        errors.append(
+            "Invalid invoice amount"
         )
 
     if invoice.currency not in allowed_currencies:
