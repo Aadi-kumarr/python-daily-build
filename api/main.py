@@ -23,6 +23,31 @@ from components.validator import validate_invoice
 
 
 app = FastAPI()
+@app.get(
+    "/health"
+)
+
+def health_check():
+
+    return {
+
+        "status":
+
+        "ok",
+
+        "components": [
+
+            "pdf_parser",
+
+            "llm_extractor",
+
+            "validator",
+
+            "pipeline",
+
+            "slack_notification"
+        ]
+    }
 app.add_middleware(
     CORSMiddleware,
 

@@ -1,10 +1,26 @@
+import sys
+import os
+
+sys.path.append(
+    os.path.dirname(
+        os.path.dirname(
+            os.path.abspath(__file__)
+        )
+    )
+)
 import pdfplumber
 from pdfminer.high_level import extract_text
 import re
+from logs.logger_config import logger
 
 # MAIN FUNCTION
 
 def parse_invoice(pdf_path):
+
+    logger.info(
+
+        f"Started PDF parsing: {pdf_path}"
+    )
 
     data = {
         "vendor": None,
@@ -97,10 +113,21 @@ def parse_invoice(pdf_path):
 
     except Exception as e:
 
-        data["error"] = str(e)
+        logger.error(
+
+            f"PDF parsing failed: {e}"
+        )
+
+        return {
+
+            "error": str(e)
+        }
 
     # RETURN FINAL DATA
+    logger.info(
 
+        "PDF parsed successfully"
+    )
     return data
 
 # MANUAL TESTING
